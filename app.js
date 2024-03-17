@@ -5,13 +5,40 @@ canvas.width = 1000;
 canvas.height = 1000;
 document.body.appendChild(canvas);
 
+var catchLimit = 5; // Set a catch limit
+
+var gameOver = function() {
+    alert("Game Over! You caught " + monstersCaught + " monsters.");
+    monstersCaught = 0 // Resetting the score for a new game, optional
+    reset(); // Optionally reset the game to start over
+    // Logic to handle game over, like stopping the game or resetting variables
+    // You might want to stop the game loop or reset monsterCaught and call reset()
+};
+
 // Background image
 var bgReady = false;
 var bgImage = new Image();
 bgImage.onload = function () {
     bgReady = true;
 };
-bgImage.src = "images/background.png";
+bgImage.src = "images/background4.jpeg";
+
+
+// Edge image
+var edgeReady = false;
+var edgeImage = new Image();
+edgeImage.onload = function () {
+    edgeReady = true;
+};
+edgeImage.src = "images/edges.jpg";
+
+// Edge2 image
+var edgeReady2 = false;
+var edgeImage2 = new Image();
+edgeImage2.onload = function () {
+    edgeReady2 = true;
+};
+edgeImage2.src = "images/edges2.jpg";
 
 // Hero image
 var heroReady = false;
@@ -29,12 +56,12 @@ monsterImage.onload = function () {
 };
 monsterImage.src = "images/monster.png";
 
-//=============== done creating image objects ==========================
+//=============== done creating image objects ===========================
 
 
 // Game objects
 var hero = {
-    speed: 256, // movement in pixels per second
+    speed: 250, // movement in pixels per second
     x: 0,  // where on the canvas are they?
     y: 0  // where on the canvas are they?
 };
@@ -45,7 +72,7 @@ var monster = {
 };
 var monstersCaught = 0;
 
-//=============== done with other variables ==========================
+//======================= done with other variables
 
 // Handle keyboard controls
 var keysDown = {}; //object were we properties when keys go down
@@ -64,59 +91,77 @@ addEventListener("keyup", function (e) {
 
 // Update game objects
 var update = function (modifier) {
-    if (38 in keysDown && hero.y > 32 + 0) { // Player holding up
+    if (38 in keysDown && hero.y > 32+0) { //  holding up key
         hero.y -= hero.speed * modifier;
     }
-    if (40 in keysDown) { // Player holding down
+    if (40 in keysDown && hero.y < canvas.height - (64 + 0)) { //  holding down key
         hero.y += hero.speed * modifier;
     }
-    if (37 in keysDown) { // Player holding left
+    if (37 in keysDown && hero.x > (32+0)) { // holding left key
         hero.x -= hero.speed * modifier;
     }
-    if (39 in keysDown) { // Player holding right
+    if (39 in keysDown && hero.x < canvas.width - (64 + 0)) { // holding right key
         hero.x += hero.speed * modifier;
     }
-  
+    
+    
 
-// Are they touching?
-    if (
-        hero.x <= (monster.x + 32)
-        && monster.x <= (hero.x + 32)
-        && hero.y <= (monster.y + 32)
-        && monster.y <= (hero.y + 32)
-    ) {
-        ++monstersCaught;       // keep track of our “score”
-        console.log('got em');
-        reset();       // start a new cycle
-    }
-  };
+        // Are they touching?
+        if (
+            hero.x <= (monster.x + 32)
+            && monster.x <= (hero.x + 32)
+            && hero.y <= (monster.y + 32)
+            && monster.y <= (hero.y + 32)
+        ) {
+            ++monstersCaught;       // keep track of our “score”
+            console.log('got em');
+
+            ++monstersCaught; // Increment the monsters caught
+            console.log('got em');
+        
+            // Here, after updating monstersCaught due to catching a monster
+            if (monstersCaught >= catchLimit) {
+                gameOver(); // Call gameOver function if catch limit reached
+            } else {
+                reset(); // Start a new cycle regardless of game over or not
+            }  
+        }  
+};
 
 
 
 // Draw everything in the main render function
 var render = function () {
+
     if (bgReady) {
-        console.log('here2');
         ctx.drawImage(bgImage, 0, 0);
     }
 
-if (heroReady) {
+    if (edgeReady) {
+        ctx.drawImage(edgeImage, 0, 0);
+        ctx.drawImage(edgeImage, 0, 968);
+    }
+
+    if (edgeReady2) {
+        ctx.drawImage(edgeImage2, 0, 0);
+        ctx.drawImage(edgeImage2, 968, 0);
+    }
+
+    if (heroReady) {
         ctx.drawImage(heroImage, hero.x, hero.y);
     }
 
     if (monsterReady) {
         ctx.drawImage(monsterImage, monster.x, monster.y);
     }
-
-
-// Score
+    // Score
     ctx.fillStyle = "rgb(250, 250, 250)";
     ctx.font = "24px Helvetica";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText("Goblins caught: " + monstersCaught, 32, 32);
-};
 
+}
 
 
 // The main game loop
@@ -124,7 +169,6 @@ var main = function () {
     var now = Date.now();
     var delta = now - then;
     update(delta / 1000);
-
     render();
     then = now;
     //  Request to do this again ASAP
@@ -149,5 +193,4 @@ var reset = function () {
 // Let's play this game!
 var then = Date.now();
 reset();
-main();  // call the main game loop.
-
+main();  // Call the main game loop

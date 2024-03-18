@@ -8,6 +8,7 @@ document.body.appendChild(canvas);
 var catchLimit = 5; // Set a catch limit
 
 var gameOver = function() {
+
     alert("Game Over! You caught " + monstersCaught + " monsters.");
     monstersCaught = 0 // Resetting the score for a new game, optional
     reset(); // Optionally reset the game to start over
@@ -58,6 +59,20 @@ monsterImage.src = "images/monster.png";
 
 //=============== done creating image objects ===========================
 
+// Sound effect paths
+var soundgotit = "images/gotit.wav";  // Path for the sound effect played when the monster is caught
+var soundGameOver = "images/gameover.mp3"; // Path for the sound effect played when the game is over
+
+//Assign audio to soundEfx
+var soundEfx = document.getElementById("soundEfx"); // Assuming this element exists in your HTML
+
+// Later in your code, to play the catch sound effect:
+soundEfx.src = soundgotit;
+soundEfx.play();
+
+// And, to play the game over sound effect:
+soundEfx.src = soundGameOver;
+soundEfx.play();
 
 // Game objects
 var hero = {
@@ -94,13 +109,13 @@ var update = function (modifier) {
     if (38 in keysDown && hero.y > 32+0) { //  holding up key
         hero.y -= hero.speed * modifier;
     }
-    if (40 in keysDown && hero.y < canvas.height - (64 + 0)) { //  holding down key
+    if (40 in keysDown && hero.y < canvas.height - (96 + 0)) { //  holding down key
         hero.y += hero.speed * modifier;
     }
     if (37 in keysDown && hero.x > (32+0)) { // holding left key
         hero.x -= hero.speed * modifier;
     }
-    if (39 in keysDown && hero.x < canvas.width - (64 + 0)) { // holding right key
+    if (39 in keysDown && hero.x < canvas.width - (96 + 0)) { // holding right key
         hero.x += hero.speed * modifier;
     }
     
@@ -113,14 +128,20 @@ var update = function (modifier) {
             && hero.y <= (monster.y + 32)
             && monster.y <= (hero.y + 32)
         ) {
+            // play sound when touch
+	        soundEfx.src = soundgotit;
+	        soundEfx.play();
+
             ++monstersCaught;       // keep track of our “score”
             console.log('got em');
-
-            ++monstersCaught; // Increment the monsters caught
-            console.log('got em');
-        
+            soundEfx.src = soundgotit;
+            soundEfx.play();
+            // play sound when touch
+            
             // Here, after updating monstersCaught due to catching a monster
             if (monstersCaught >= catchLimit) {
+                soundEfx.src = soundGameOver; // Play game over sound
+                soundEfx.play();
                 gameOver(); // Call gameOver function if catch limit reached
             } else {
                 reset(); // Start a new cycle regardless of game over or not

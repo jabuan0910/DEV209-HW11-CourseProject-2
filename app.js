@@ -136,7 +136,7 @@ addEventListener("keyup", function (e) {
 
 // Update game objects
 var update = function (modifier) {
-    left = true; 
+    left = false; 
     right = false;
     up = false;
     down = false;
@@ -194,9 +194,10 @@ var update = function (modifier) {
         srcY = trackDown * height;
     }
 
-    if (left == false && right == false) {
+    if (left == false && right == false && up == false && down == false) {
         srcX = 1 * width;
         srcY = 0 * height;
+
     }
 
         // Are they touching?

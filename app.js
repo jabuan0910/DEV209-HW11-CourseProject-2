@@ -4,6 +4,36 @@ var ctx = canvas.getContext("2d");
 canvas.width = 1000;
 canvas.height = 1000;
 document.body.appendChild(canvas);
+var counter = 0;
+
+// lots of variables to keep track of sprite geometry
+//  I have 8 rows and 3 cols in my space ship sprite sheet
+var rows = 8;
+var cols = 3;
+
+//second row for the right movement (counting the index from 0)
+var trackRight = 2;
+//third row for the left movement (counting the index from 0)
+var trackLeft = 5;
+var trackUp = 0;   // not using up and down in this version, see next version
+var trackDown = 7;
+
+var spriteWidth = 192; // also  spriteWidth/cols; 
+var spriteHeight = 512;  // also spriteHeight/rows; 
+var width = spriteWidth / cols; 
+var height = spriteHeight / rows; 
+
+var curXFrame = 0; // start on left side
+var frameCount = 3;  // 3 frames per row
+//x and y coordinates of the overall sprite image to get the single frame  we want
+var srcX = 0;  // our image has no borders or other stuff
+var srcY = 0;
+
+//Assuming that at start the character will move right side 
+var left = false;
+var right = true;
+var up = false;
+var down = false;
 
 var catchLimit = 5; // Set a catch limit
 
@@ -47,7 +77,7 @@ var heroImage = new Image();
 heroImage.onload = function () {
     heroReady = true;
 };
-heroImage.src = "images/hero.png";
+heroImage.src = "images/Sprite.png";
 
 // Monster image
 var monsterReady = false;
@@ -106,20 +136,68 @@ addEventListener("keyup", function (e) {
 
 // Update game objects
 var update = function (modifier) {
+    left = true; 
+    right = false;
+    up = false;
+    down = false;
+
     if (38 in keysDown && hero.y > 32+0) { //  holding up key
         hero.y -= hero.speed * modifier;
+        up = true;
     }
     if (40 in keysDown && hero.y < canvas.height - (96 + 0)) { //  holding down key
         hero.y += hero.speed * modifier;
+        down = true;
     }
     if (37 in keysDown && hero.x > (32+0)) { // holding left key
         hero.x -= hero.speed * modifier;
+        left = true;   // for animation
+
     }
     if (39 in keysDown && hero.x < canvas.width - (96 + 0)) { // holding right key
         hero.x += hero.speed * modifier;
+        right = true; // for animation
     }
     
-    
+    // curXFrame = ++curXFrame % frameCount; 	//Updating the sprite frame index 
+    // it will count 0,1,2,0,1,2,0, etc
+
+    if (counter == 5) {  // adjust this to change "walking speed" of animation
+        curXFrame = ++curXFrame % frameCount; 	//Updating the sprite frame index 
+        // it will count 0,1,2,0,1,2,0, etc
+        counter = 0;
+    } else {
+        counter++;
+    }
+
+
+    srcX = curXFrame * width;   	//Calculating the x coordinate for spritesheet 
+    //if left is true,  pick Y dim of the correct row
+    if (left) {
+        //calculate srcY 
+        srcY = trackLeft * height;
+    }
+
+    //if the right is true,   pick Y dim of the correct row
+    if (right) {
+        //calculating y coordinate for spritesheet
+        srcY = trackRight * height;
+    }
+
+    if (up) {
+        //calculate srcY 
+        srcY = trackUp * height;
+    }
+
+    if (down) {
+        //calculate srcY 
+        srcY = trackDown * height;
+    }
+
+    if (left == false && right == false && up == false && down == false) {
+        srcX = 1 * width;
+        srcY = 0 * height;
+    }
 
         // Are they touching?
         if (
@@ -134,6 +212,9 @@ var update = function (modifier) {
 
             ++monstersCaught;       // keep track of our “score”
             console.log('got em');
+        
+
+
             soundEfx.src = soundgotit;
             soundEfx.play();
             // play sound when touch
@@ -168,8 +249,12 @@ var render = function () {
         ctx.drawImage(edgeImage2, 968, 0);
     }
 
+
+
+
     if (heroReady) {
-        ctx.drawImage(heroImage, hero.x, hero.y);
+    //ctx.drawImage(heroImage, hero.x, hero.y);
+     ctx.drawImage(heroImage, srcX, srcY, width, height, hero.x, hero.y, width, height);
     }
 
     if (monsterReady) {

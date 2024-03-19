@@ -31,7 +31,7 @@ var srcY = 0;
 
 //Assuming that at start the character will move right side 
 var left = false;
-var right = true;
+var right = false;
 var up = false;
 var down = false;
 
@@ -194,7 +194,7 @@ var update = function (modifier) {
         srcY = trackDown * height;
     }
 
-    if (left == false && right == false && up == false && down == false) {
+    if (left == false && right == false) {
         srcX = 1 * width;
         srcY = 0 * height;
     }

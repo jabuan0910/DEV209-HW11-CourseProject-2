@@ -39,7 +39,7 @@ var catchLimit = 5; // Set a catch limit
 
 var gameOver = function() {
 
-    alert("Game Over! You caught " + monstersCaught + " monsters.");
+    alert("Game Over! You caught " + monstersCaught + " aliens.");
     monstersCaught = 0 // Resetting the score for a new game, optional
     reset(); // Optionally reset the game to start over
     // Logic to handle game over, like stopping the game or resetting variables
@@ -87,6 +87,15 @@ monsterImage.onload = function () {
 };
 monsterImage.src = "images/monster.png";
 
+
+// newChar image
+var newCharReady = false;
+var newCharImage = new Image();
+newCharImage.onload = function () {
+    newCharReady = true;
+};
+newCharImage.src = "images/enemies.png";
+
 //=============== done creating image objects ===========================
 
 // Sound effect paths
@@ -110,6 +119,25 @@ var hero = {
     x: 0,  // where on the canvas are they?
     y: 0  // where on the canvas are they?
 };
+
+var newChar1 = {
+    x: 80,
+    y: 80,
+    direction: 1
+};
+
+var newChar2 = {
+    x: 450,
+    y: 400,
+    direction: -1
+};
+
+var newChar3 = {
+    x: 700,
+    y: 650,
+    direction: 1
+};
+
 var monster = {
 // for this version, the monster does not move, so just and x and y
     x: 0,
@@ -134,6 +162,10 @@ addEventListener("keyup", function (e) {
     delete keysDown[e.keyCode];
 }, false);
 
+// Time limit in seconds
+var timeLimit = 1000;
+var timeRemaining = timeLimit;
+
 // Update game objects
 var update = function (modifier) {
     left = false; 
@@ -141,6 +173,14 @@ var update = function (modifier) {
     up = false;
     down = false;
 
+    // Decrement the time remaining
+    timeRemaining--;
+    
+    if (timeRemaining <= 0) {
+        gameOver();
+        // Optionally reset time for next game
+        timeRemaining = timeLimit;
+    }
     if (38 in keysDown && hero.y > 32+0) { //  holding up key
         hero.y -= hero.speed * modifier;
         up = true;
@@ -261,14 +301,21 @@ var render = function () {
     if (monsterReady) {
         ctx.drawImage(monsterImage, monster.x, monster.y);
     }
+
+    if (newCharReady) {
+        ctx.drawImage(newCharImage, newChar1.x, newChar1.y);
+        ctx.drawImage(newCharImage, newChar2.x, newChar2.y);
+        ctx.drawImage(newCharImage, newChar3.x, newChar3.y);
+    }
+
     // Score
     ctx.fillStyle = "rgb(250, 250, 250)";
     ctx.font = "24px Helvetica";
-    ctx.textAlign = "left";
+    ctx.textAlign = "right";
     ctx.textBaseline = "top";
-    ctx.fillText("Goblins caught: " + monstersCaught, 32, 32);
+    ctx.fillText("Time left: " + timeRemaining + " UFO's: " + monstersCaught, 280, 32);
 
-}
+};
 
 
 // The main game loop

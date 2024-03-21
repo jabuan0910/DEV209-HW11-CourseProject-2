@@ -38,8 +38,15 @@ var down = false;
 var catchLimit = 5; // Set a catch limit
 
 var gameOver = function() {
-
     alert("Game Over! You caught " + monstersCaught + " aliens.");
+    monstersCaught = 0 // Resetting the score for a new game, optional
+    reset(); // Optionally reset the game to start over
+    // Logic to handle game over, like stopping the game or resetting variables
+    // You might want to stop the game loop or reset monsterCaught and call reset()
+};
+
+var gameOver2 = function() {
+    alert("Game Over! You were caught by an enemy.")
     monstersCaught = 0 // Resetting the score for a new game, optional
     reset(); // Optionally reset the game to start over
     // Logic to handle game over, like stopping the game or resetting variables
@@ -120,19 +127,19 @@ var hero = {
     y: 0  // where on the canvas are they?
 };
 
-var newChar1 = {
+var newEnemy1 = {
     x: 80,
     y: 80,
     direction: 1
 };
 
-var newChar2 = {
+var newEnemy2 = {
     x: 450,
-    y: 400,
+    y: 350,
     direction: -1
 };
 
-var newChar3 = {
+var newEnemy3 = {
     x: 700,
     y: 650,
     direction: 1
@@ -144,6 +151,7 @@ var monster = {
     y: 0
 };
 var monstersCaught = 0;
+
 
 //======================= done with other variables
 
@@ -210,6 +218,39 @@ var update = function (modifier) {
         counter++;
     }
 
+   if  (
+            hero.x <= (newEnemy1.x + 150)
+            && newEnemy1.x <= (hero.x + 32)
+            && hero.y <= (newEnemy1.y + 90)
+            && newEnemy1.y <= (hero.y + 32)
+        ) { 
+            soundEfx.src = soundGameOver; // Play game over sound
+            soundEfx.play();
+            gameOver2(); // Call gameOver function if catch limit reached
+        }
+
+    if  (
+            hero.x <= (newEnemy2.x + 150)
+            && newEnemy2.x <= (hero.x + 32)
+            && hero.y <= (newEnemy2.y + 90)
+            && newEnemy2.y <= (hero.y + 32)
+        ) { 
+            soundEfx.src = soundGameOver; // Play game over sound
+            soundEfx.play();
+            gameOver2(); // Call gameOver function if catch limit reached
+        }
+
+    if  (
+            hero.x <= (newEnemy3.x + 150)
+            && newEnemy3.x <= (hero.x + 32)
+            && hero.y <= (newEnemy3.y + 90)
+            && newEnemy3.y <= (hero.y + 32)
+        ) { 
+            soundEfx.src = soundGameOver; // Play game over sound
+            soundEfx.play();
+            gameOver2(); // Call gameOver function if catch limit reached
+        }
+
 
     srcX = curXFrame * width;   	//Calculating the x coordinate for spritesheet 
     //if left is true,  pick Y dim of the correct row
@@ -239,8 +280,8 @@ var update = function (modifier) {
         srcY = 0 * height;
 
     }
-
-        // Are they touching?
+ 
+    // Are they touching?
         if (
             hero.x <= (monster.x + 32)
             && monster.x <= (hero.x + 32)
@@ -303,9 +344,9 @@ var render = function () {
     }
 
     if (newCharReady) {
-        ctx.drawImage(newCharImage, newChar1.x, newChar1.y);
-        ctx.drawImage(newCharImage, newChar2.x, newChar2.y);
-        ctx.drawImage(newCharImage, newChar3.x, newChar3.y);
+        ctx.drawImage(newCharImage, newEnemy1.x, newEnemy1.y);
+        ctx.drawImage(newCharImage, newEnemy2.x, newEnemy2.y);
+        ctx.drawImage(newCharImage, newEnemy3.x, newEnemy3.y);
     }
 
     // Score
